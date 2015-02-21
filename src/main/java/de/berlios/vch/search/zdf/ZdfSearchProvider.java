@@ -15,6 +15,7 @@ import org.apache.felix.ipojo.annotations.Component;
 import org.apache.felix.ipojo.annotations.Provides;
 import org.apache.felix.ipojo.annotations.Requires;
 import org.osgi.framework.ServiceException;
+import org.osgi.service.log.LogService;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -38,6 +39,9 @@ public class ZdfSearchProvider implements ISearchProvider {
 
     @Requires(filter = "(instance.name=vch.parser.zdf)")
     private IWebParser parser;
+
+    @Requires
+    private LogService logger;
 
     @Override
     public String getName() {
@@ -65,32 +69,36 @@ public class ZdfSearchProvider implements ISearchProvider {
 
         NodeList teasers = content.getElementsByTagName("teaser");
         for (int i = 0; i < teasers.getLength(); i++) {
-            Node teaser = teasers.item(i);
-            String type = XmlParserUtils.getTextContent(teaser, "type");
-            if (!"video".equals(type)) {
-                continue;
-            }
+            try {
+                Node teaser = teasers.item(i);
+                String type = XmlParserUtils.getTextContent(teaser, "type");
+                if (!"video".equals(type)) {
+                    continue;
+                }
 
-            String title = XmlParserUtils.getTextContent(teaser, "title");
-            String description = XmlParserUtils.getTextContent(content, "detail");
-            String id = XmlParserUtils.getTextContent(teaser, "assetId");
+                String title = XmlParserUtils.getTextContent(teaser, "title");
+                String description = XmlParserUtils.getTextContent(content, "detail");
+                String id = XmlParserUtils.getTextContent(teaser, "assetId");
 
-            VideoPage video = new VideoPage();
-            video.setParser(getId());
-            video.setTitle(title);
-            video.setDescription(description);
-            video.getUserData().put("id", id);
-            video.setUri(new URI(BASE_URI + "/beitragsDetails?ak=web&id=" + id));
-            opage.getPages().add(video);
+                VideoPage video = new VideoPage();
+                video.setParser(getId());
+                video.setTitle(title);
+                video.setDescription(description);
+                video.getUserData().put("id", id);
+                video.setUri(new URI(BASE_URI + "/beitragsDetails?ak=web&id=" + id));
+                opage.getPages().add(video);
 
-            // parse the uri of the preview image
-            Map<Integer, String> images = parsePreviewImages(teaser);
-            if (images.size() > 0) {
-                List<Integer> sizes = new ArrayList<Integer>(images.keySet());
-                Collections.sort(sizes);
-                String thumbUri = images.get(getClosest(sizes, PREFERRED_THUMB_WIDTH));
-                video.setThumbnail(new URI(thumbUri));
-                // String biggest = images.get(sizes.get(sizes.size() - 1));
+                // parse the uri of the preview image
+                Map<Integer, String> images = parsePreviewImages(teaser);
+                if (images.size() > 0) {
+                    List<Integer> sizes = new ArrayList<Integer>(images.keySet());
+                    Collections.sort(sizes);
+                    String thumbUri = images.get(getClosest(sizes, PREFERRED_THUMB_WIDTH));
+                    video.setThumbnail(new URI(thumbUri));
+                    // String biggest = images.get(sizes.get(sizes.size() - 1));
+                }
+            } catch (Exception e) {
+                logger.log(LogService.LOG_ERROR, "Couldn't parse one of the search results", e);
             }
         }
 
@@ -104,10 +112,9 @@ public class ZdfSearchProvider implements ISearchProvider {
         for (int i = 0; i < images.size(); i++) {
             Node teaserimage = images.get(i);
             String size = teaserimage.getAttributes().getNamedItem("key").getNodeValue();
-            String alt = teaserimage.getAttributes().getNamedItem("alt").getNodeValue();
             int width = Integer.parseInt(size.substring(0, size.indexOf('x')));
             String uri = teaserimage.getTextContent();
-            if (!uri.contains("fallback") && alt.length() > 0) { // fallback URIs don't work at the moment (28.04.2013)
+            if (!uri.contains("fallback")) { // fallback URIs don't work at the moment (28.04.2013)
                 imageUris.put(width, uri);
             }
         }
