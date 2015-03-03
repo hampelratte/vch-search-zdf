@@ -5,6 +5,7 @@
     <packaging>bundle</packaging>
     <version>1.0.0-SNAPSHOT</version>
     <name>VCH ZDF Search</name>
+    <description>Search provider for ZDFmediathek videos</description>
 
     <parent>
         <artifactId>parent</artifactId>
@@ -13,34 +14,39 @@
         <relativePath>../vch-parent/pom.xml</relativePath>
     </parent>
 
-    <description>Search provider for ZDFmediathek videos</description>
+    <scm>
+        <connection>scm:git:git@github.com/hampelratte/vch-search-zdf.git</connection>
+        <developerConnection>scm:git:git@github.com:hampelratte/vch-search-zdf.git</developerConnection>
+        <url>https://github.com/hampelratte/vch-search-zdf.git</url>
+    </scm>
+
     <dependencies>
         <dependency>
-        	<groupId>de.berlios.vch</groupId>
-        	<artifactId>parser</artifactId>
-        	<type>bundle</type>
-        	<scope>provided</scope>
+            <groupId>de.berlios.vch</groupId>
+            <artifactId>parser</artifactId>
+            <type>bundle</type>
+            <scope>provided</scope>
             <version>[3.0.0,4.0.0)</version>
         </dependency>
         <dependency>
-        	<groupId>de.berlios.vch</groupId>
-        	<artifactId>search</artifactId>
-        	<type>bundle</type>
-        	<scope>provided</scope>
+            <groupId>de.berlios.vch</groupId>
+            <artifactId>search</artifactId>
+            <type>bundle</type>
+            <scope>provided</scope>
             <version>[1.0.0,2.0.0)</version>
         </dependency>
         <dependency>
-        	<groupId>de.berlios.vch</groupId>
-        	<artifactId>httpclient</artifactId>
-        	<type>bundle</type>
-        	<scope>provided</scope>
+            <groupId>de.berlios.vch</groupId>
+            <artifactId>httpclient</artifactId>
+            <type>bundle</type>
+            <scope>provided</scope>
             <version>[1.0.0,2.0.0)</version>
         </dependency>
         <dependency>
-        	<groupId>de.berlios.vch</groupId>
-        	<artifactId>i18n</artifactId>
-        	<type>bundle</type>
-        	<scope>provided</scope>
+            <groupId>de.berlios.vch</groupId>
+            <artifactId>i18n</artifactId>
+            <type>bundle</type>
+            <scope>provided</scope>
             <version>[1.0.0,2.0.0)</version>
         </dependency>
         <dependency>
